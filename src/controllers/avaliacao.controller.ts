@@ -9,7 +9,7 @@ export class AvaliacaoController {
     criarAvaliacao(arg0: string, criarAvaliacao: any) {
        throw new Error("Method not implemented.");
     }
-
+  
     //POST http://localhost:3335/aluno/:id/avaliacao
 
     public async CriarAvaliacao(req: Request, res: Response){
