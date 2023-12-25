@@ -5,14 +5,11 @@ import { Avaliacao } from "../models/avaliacao.model";
 import { adaptAlunoPrisma } from "../util/aluno.adapter";
 
 
-export class AvaliacaoController {
-    criarAvaliacao(arg0: string, criarAvaliacao: any) {
-       throw new Error("Method not implemented.");
-    }
+ export class AvaliacaoController {
   
     //POST http://localhost:3335/aluno/:id/avaliacao
 
-    public async CriarAvaliacao(req: Request, res: Response){
+    public async criarAvaliacao(req: Request, res: Response){
         try {
             //entrada
            const {id} = req.params;
@@ -63,5 +60,6 @@ export class AvaliacaoController {
         }
     }
 }
+
 
 
