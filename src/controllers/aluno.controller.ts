@@ -1,190 +1,172 @@
 import { Request, Response } from "express";
-import repository from "../database/prisma.repository";
 import { Aluno } from "../models/aluno.model";
+import repository from "../database/prisma.repository";
 import { erroNaoEncontrado } from "../util/response.helper";
 
 export class AlunoController {
-   // criar um novo aluno
-    public async criarAluno(req: Request, res: Response){
-        
-        try{
-             //1- entrada
-        const { nome, email, senha, idade}= req.body
+    // Criar um novo aluno
+    public async criarAluno(req: Request, res: Response) {
+        try {
+            // 1- Entrada
+            const { nome, email, senha, idade } = req.body;
 
-        if(!nome || !email || !senha){
-         res.status(400).send({
-             ok: false,
-             message: "Os campos obrigatorios não foram informados"
-         })
-        };
-         
- 
-     //2- processamento
-         const aluno = new Aluno( nome , email, senha, idade )
- 
-         const result = await repository.aluno.create({
-              data: aluno
-         });
- 
-     //3- saída 
-       return res.status(201).send({
-         ok: true,
-         message: "Usuario criado com sucesso",
-         data: result,
-       })
-      
-        } catch(error:any){
+            if (!nome) {
+                return res.status(400).send({
+                    ok: false,
+                    message: "Nome não foi informado",
+                });
+            }
+
+            // 2- Processamento
+            const aluno = new Aluno(nome, email, senha, idade);
+
+            const result = await repository.aluno.create({
+                data: aluno,
+            });
+
+            // 3- Saída
+            return res.status(201).send({
+                ok: true,
+                message: "Usuário criado com sucesso",
+                data: result,
+            });
+        } catch (error: any) {
             return res.status(500).send({
                 ok: false,
-                message: error.toString()
+                message: error.toString(),
+            });
+        }
+    }
+
+    // Obter um aluno pelo ID
+    public async obterAluno(req: Request, res: Response) {
+        try {
+            // 1- Entrada
+            const { id } = req.params;
+
+            // 2- Processamento
+            const aluno = await repository.aluno.findUnique({
+                where: {
+                    id,
+                },
             });
 
-        }
-       
-    }
-  
+            if (!aluno) {
+                return res.status(404).send({
+                    ok: false,
+                    message: "Aluno não encontrado",
+                });
+            }
 
- // obter um aluno pelo ID
- public async obterAluno( req: Request, res: Response){
-   try {
-    //1- entrada
-     const {id} = req.params;
-     
-    //2-processamento
-    const aluno= await repository.aluno.findUnique({
-        where: {
-            id,
-        },
-    });
-
-    if(!aluno){
-        res.status(404).send({
-            ok: false,
-            message: "Aluno não encontrado"
-        })
-       };
-
-    //3- saída 
-
-    return res.status(200).send({
-        ok:true,
-        message:"Aluno obtido com sucesso",
-        data: aluno,
-    });
-    
-   } catch(error:any){
+            // 3- Saída
+            return res.status(200).send({
+                ok: true,
+                message: "Aluno obtido com sucesso",
+                data: aluno,
+            });
+        } catch (error: any) {
             return res.status(500).send({
                 ok: false,
-                message: error.toString()
+                message: error.toString(),
             });
-
         }
-   }
-
-
-   //Deletar aluno
-   public async deletarAluno(req:Request, res: Response){
-    try {
-        //1 entrada
-        const {id} = req.params;
- 
-
-        //2 processamento
-
-        const aluno = await repository.aluno.findUnique({
-            where:{
-                id
-            }
-        });
-
-        if (!aluno) {
-           return erroNaoEncontrado(res,"Aluno")
-        }
-         
-
-        await repository.aluno.delete({
-            where:{
-                id,
-            }
-        });
-
-        //3 deletar o aluno
-        return res.status(200).send({
-            ok:true,
-            message:"Aluno deletado com sucesso"
-        });
-
-       } catch(error:any){
-     return res.status(500).send({
-        ok:false,
-        message: error.toString()
-     })
-
     }
 
-   }
+    // PUT - atualizar um aluno
+    public async atualizarAluno(req: Request, res: Response) {
+        try {
+            // 1- Entrada
+            const { id } = req.params;
+            const { nome, idade } = req.body;
 
+            if (!nome && !idade) {
+                return res.status(400).send({
+                    ok: false,
+                    message: "Informe ao menos um campo para atualizar",
+                });
+            }
 
- 
-   public async atualizarAluno(req: Request, res: Response){
-
-    try {
-        //1 entrada
-        const {id}= req.params;
-        const{nome, idade}= req.body;
-
-        if (!nome && !idade){
-            return res.status(400).send({
-                ok:false,
-                message: "Informe ao menos um campo para atualizar",
+            // 2- Processamento
+            // verificar se o aluno existe
+            const aluno = await repository.aluno.findUnique({
+                where: {
+                    id,
+                },
             });
-        }
 
+            if (!aluno) {
+                return erroNaoEncontrado(res, "Aluno");
+            }
 
-        // 2 processamento
+            // atualizar os dados do aluno
+            const result = await repository.aluno.update({
+                where: {
+                    id,
+                },
+                data: {
+                    nome,
+                    idade,
+                },
+            });
 
-        const aluno = await repository.aluno.findUnique({
-            where:{
-                id,
-            },
-        });
-
-        if (!aluno){
-            return res.status(4040).send({
+            // 3- Saída
+            return res.status(200).send({
+                ok: true,
+                message: "Aluno atualizado com sucesso",
+                data: result,
+            });
+        } catch (error: any) {
+            return res.status(500).send({
                 ok: false,
-                message:"Aluno não existe",
+                message: error.toString(),
             });
         }
-
-
-       const result = await repository.aluno.update({
-            where:{
-                id,
-            },
-            data: {
-                nome,
-                idade,
-            },
-        });
-
-        // saida
-
-        return res.status(200).send({
-            ok:true,
-            message: "Aluno atualizado com sucesso",
-            data: result,
-        })
-
-
-    }catch (error:any){
-        return res.status(500).send({
-            ok: false,
-            message: error.toString()
-        });
-
     }
-   }
- }
 
+    // DELETE - deletar um aluno
+    public async deletarAluno(req: Request, res: Response) {
+        try {
+            // 1- Entrada
+            const { id } = req.params;
+
+            // 2- Processamento
+            // verificar se o aluno existe, se não 404
+            const aluno = await repository.aluno.findUnique({
+                where: {
+                    id,
+                },
+            });
+
+            if (!aluno) {
+                return res.status(404).send({
+                    ok: false,
+                    message: "Aluno não encontrado",
+                });
+            }
+
+            // deletar o aluno
+            await repository.aluno.delete({
+                where: {
+                    id,
+                },
+            });
+
+            // 3- Saída
+            return res.status(200).send({
+                ok: true,
+                message: "Aluno deletado com sucesso",
+            });
+        } catch (error: any) {
+            return res.status(500).send({
+                ok: false,
+                message: error.toString(),
+            });
+        }
+    }
+
+    public async listarAlunos(req: Request, res: Response) {
+        return res.status(200).send(await repository.aluno.findMany());
+    }
+}
 
  

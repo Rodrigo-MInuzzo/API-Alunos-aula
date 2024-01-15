@@ -13,6 +13,3 @@ import { Aluno } from "./aluno.model";
     }
  }
 
- const daphne = new Aluno ("Daphne", "", "", 10)
-
- const avaliacao= new Avaliacao("banco II", 10 , daphne)

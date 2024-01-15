@@ -14,4 +14,3 @@ export class Aluno{
 
 }
 
-const daphne = new Aluno( "Daphne", "daphne@dog", "564564");

@@ -1,29 +1,21 @@
- import express from "express";
-import { AlunoController } from "./controllers/aluno.controller";
-import { AvaliacaoController } from "./controllers/avaliacao.controller";
+import express from "express";
+import cors from "cors";
+import * as dotenv from "dotenv";
+dotenv.config();
 
- const app= express();
- app.use(express.json());
+import { alunoRoutes } from "./routes/aluno.routes";
+import { loginRoutes } from "./routes/login.routes";
 
+const app = express();
+app.use(express.json());
+app.use(cors());
 
+app.use("/aluno", alunoRoutes());
+app.use("/login", loginRoutes());
 
-const alunoController = new AlunoController();
- const avaliacaoController= new AvaliacaoController();
-
-app.post("/aluno", alunoController.criarAluno);
-app.get("/aluno/:id", alunoController.obterAluno);
-app.delete("/aluno/:id", alunoController.deletarAluno);
-app.put("/aluno/:id", alunoController.atualizarAluno)
-
-
-// rotas de avaliacao
-app.post("/aluno/:id/avaliacao", avaliacaoController.criarAvaliacao)
-
-
- app.listen (3335,() => {
+app.listen(process.env.PORT, () => {
     console.log("API está rodando");
- });
-
+});
 
 
 
